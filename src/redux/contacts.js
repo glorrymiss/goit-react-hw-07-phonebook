@@ -1,5 +1,36 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { fetchContacts } from './operations';
+import { fetchContact, addContact, deleteContact } from './operations';
+
+const hendlePending = (state, action) => {
+  state.contacts.isLoading = true;
+};
+
+const handleSuccessGet = (state, action) => {
+  state.contacts.isLoading = false;
+  state.contacts.error = null;
+  state.contacts.data = action.payload;
+};
+
+const handleSuccessCreate = (state, action) => {
+  console.log(action);
+  state.contacts.isLoading = false;
+  state.contacts.error = null;
+  state.contacts.data.push(action.payload);
+};
+
+const handleSuccessDelete = (state, action) => {
+  state.contacts.isLoading = false;
+  state.contacts.error = null;
+  const index = state.contacts.data.findIndex(
+    contact => contact.id === action.payload.id
+  );
+  state.contacts.data.splice(index, 1);
+};
+
+const handleError = (state, action) => {
+  state.isLoading = false;
+  state.error = action.payload;
+};
 
 export const Contacts = createSlice({
   name: 'contacts',
@@ -11,38 +42,26 @@ export const Contacts = createSlice({
     },
     filter: '',
   },
-
   reducers: {
-    addContacts(state, action) {
-      state.contacts.push(action.payload);
-    },
-    deleteContacts(state, action) {
-      const index = state.contacts.findIndex(
-        contact => contact.id === action.payload
-      );
-      state.contacts.splice(index, 1);
-    },
-    contactsFilter(state, action) {
+    contactsFilter: (state, action) => {
       state.filter = action.payload;
     },
   },
-  extraReducers: {
-    [fetchContacts.pending](state) {
-      state.isLoading = true;
-    },
-    [fetchContacts.fulfilled](state, action) {
-      state.isLoading = false;
-      state.error = null;
-      state.items = action.payload;
-    },
-    [fetchContacts.rejected](state, action) {
-      state.isLoading = false;
-      state.error = action.payload;
-    },
+  extraReducers: builder => {
+    builder
+      .addCase(fetchContact.pending, hendlePending)
+      .addCase(fetchContact.fulfilled, handleSuccessGet)
+      .addCase(fetchContact.rejected, handleError)
+      .addCase(addContact.pending, hendlePending)
+      .addCase(addContact.fulfilled, handleSuccessCreate)
+      .addCase(addContact.rejected, handleError)
+      .addCase(deleteContact.pending, hendlePending)
+      .addCase(deleteContact.fulfilled, handleSuccessDelete)
+      .addCase(deleteContact.rejected, handleError);
   },
 });
 
 // Генератори екшенів
-export const { addContacts, deleteContacts, contactsFilter } = Contacts.actions;
+export const { contactsFilter } = Contacts.actions;
 
 export const ContactsReducer = Contacts.reducer;

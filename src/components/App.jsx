@@ -4,21 +4,20 @@ import { ContactForm } from './ContactForm/ContactForm';
 import { ContactList } from './ContactList/ContactList';
 import { useDispatch } from 'react-redux';
 import { useEffect } from 'react';
-// import { getContacts } from 'redux/selectors';
-import { fetchContacts } from 'redux/operations';
+import { fetchContact } from 'redux/operations';
 
 export const App = () => {
   const dispatch = useDispatch();
   // const { data, isLoading, error } = useSelector(getContacts);
 
   useEffect(() => {
-    dispatch(fetchContacts());
+    dispatch(fetchContact());
   }, [dispatch]);
 
   return (
     <Container
       style={{
-        height: '100vh',
+        minHeight: '100vh',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
